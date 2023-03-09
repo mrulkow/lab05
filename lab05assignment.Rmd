@@ -1,0 +1,185 @@
+---
+title: 'Stats 250: Lab 5'
+author: "Replace this text with your name"
+date: "Week of March 13th"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+### Instructions
+
+Complete the lab exercises and Dive Deeper questions below. Lab exercises will be graded out of 2 points each and the Dive Deeper questions will be graded out of 3 points each - all of them will be graded for *correctness*. Upon completion, follow the submission instructions at the bottom of this document. We strongly encourage you to work on this assignment with a partner. 
+
+***
+
+### Background
+
+We collected the typing speeds for a random sample of 41 Stats 250 students. These students completed a medium-difficulty one-minute typing test. The number of typed words, with and without errors, was recorded. The `typing` data set contains the following variables:
+
+- `typingSpeed`: the number of words typed in one minute (with errors) (measured in words per minute or wpm)
+- `accuracy`: percentage of words typed correctly
+- `netSpeed`: the number of words correctly typed in one minute (without errors) (measured in words per minute or wpm)
+
+If you're interested in your own typing abilities, you can take the one-minute test [here](https://www.typingtest.com/). Select "Medium Text".  
+
+
+Use the following code chunk to read in the data set. 
+
+```{r readData}
+typing <- read.csv("typingSpeeds.csv")
+```
+
+You can preview the data below.
+
+```{r previewData}
+head(typing)
+```
+
+
+***
+
+
+### Lab Exercises
+
+After reading the background above, complete the following lab exercises. Remember, these exercises are worth 2 points each and are graded for correctness.
+
+> **1.** Exercises 1 - 5 will focus on estimating the average typing speed of all Stats 250 students. Use the `qqnorm()` and `qqline()` functions to create a QQ plot for the sample of typing speeds (`typingSpeed`). Is it reasonable to assume that this sample of typing speeds was drawn from a normally distributed population? Briefly explain your answer.
+
+```{r exercise1, error = T}
+# Replace this comment with your code
+
+```
+
+*Answer:* Replace this text with your answer.
+
+
+
+> **2.** Provide the symbol and value of the point estimate for the population mean typing speed of Stats 250 students. Note: you will need to use R.
+
+```{r exercise2, error = T}
+# Replace this comment with your code
+
+```
+
+*Answer:* Replace this text with the symbol and value. 
+
+
+
+> **3.** Calculate the standard *error* for the sampling distribution of the sample mean -- s.e.(x_bar). Note: you will need to use R to compute the standard *deviation*. Reference the formula sheet if you forgot how to calculate the standard error!
+
+```{r exercise3, error = T}
+# Replace this comment with your code
+
+```
+
+*Answer:* Replace this text with the value of the standard error. 
+
+
+
+> **4.** Use R to find the t* multiplier for a 90% confidence interval that estimates the population mean typing speed of Stats 250 students. Remember, this multiplier depends on sample size. 
+
+```{r exercise4, error = T}
+# Replace this comment with your code
+
+```
+
+
+
+> **5.**  Use the `t.test()` function and the `typingSpeed` variable to create the 90% confidence interval for the population mean typing speed of Stats 250 students. Interpret the confidence interval within context.
+
+```{r exercise5, error = T}
+# Replace this comment with your code
+
+```
+
+*Answer:* Replace this text with your answer.
+
+
+
+> **Optional:** Confirm that the values you calculated in Exercises 2 - 4 are correct by using them to calulate the 90% confidence interval "from scratch". This interval should match the interval you found in Exercise 5. 
+
+```{r optional, error = T}
+# Replace this comment with your code
+
+```
+
+
+
+> **6.** Exercises 6 - 7 will focus on running a hypothesis test for the average *net* typing speed of all Stats 250 students. Use the `qqnorm()` and `qqline()` functions to create a QQ plot for the sample of net typing speeds (`netSpeed`). Is it reasonable to assume that this sample of net typing speeds was drawn from a normally distributed population? Briefly explain your answer.
+
+```{r exercise6, error = T}
+# Replace this comment with your code
+
+```
+
+*Answer:* Replace this text with your answer. 
+
+
+
+> **7.** The website labels a "fluent" typer as someone who has a *net* typing speed of 45 words per minute. We would like to test if the population mean net typing speed of all Stats 250 students is above this value. Use the `t.test()` function and `netSpeed` variable to run this hypothesis test. Based on the output, evaluate the p-value and provide a conclusion in the context of the problem. 
+
+```{r exercise7, error = T}
+# Replace this comment with your code
+
+```
+
+*Evaluation:* Replace this text with your answer.
+
+*Conclusion:* Replace this text with your answer.
+
+
+
+***
+
+
+
+### Dive Deeper Questions
+
+After completing the lab exercises above, complete the following Dive Deeper questions. Remember, these questions are worth 3 points each and are graded for correctness.
+
+> **1.** The following interpretation of the p-value (from Exercise 7) is incomplete. Finish the statement within the context of the hypothesis test. "The probability of observing a t-test statistic of 3.1923 or greater is 0.001374..."  
+
+*Answer:* ...replace this text with your answer.
+
+
+
+> **2.** If we had analyzed the typing accuracy (`accuracy`), we would have observed the QQ Plot below. Based on this QQ Plot, we *cannot* conclude that the sample follows a normal model. We have a large enough sample size, however, to utilize the Central Limit Theorem. When we rely on the CLT, what is approximately normal with a sufficiently large sample size? Be specific. 
+
+```{r qqplotAccuracy}
+qqnorm(typing$accuracy, main = "QQ Plot of Typing Accuracy")
+qqline(typing$accuracy)
+```
+
+**Answer:** Replace this text with your answer.
+
+
+
+***
+
+
+
+### Submission Instructions
+
+Once you have finished, follow the instructions below to submit your work.
+
+1. At the top of the document, update the `author` field. Do not change anything else at the top of the document.
+
+2. Click the Knit button to create an HTML file of your work.
+
+3. In the Files pane (bottom right window), check the box next to `lab05assignment.html`. 
+
+4. In the Files pane, click on the gear icon (More) and select "Export..."  
+
+5. Do not change the file name (`lab05assignment.html`). Click Download and save the file to your computer. 
+
+6. On the Stats 250 Canvas site, navigate to the Lab 5 assignment. 
+
+7. Upload your saved `lab05assignment.html` file. 
+
+8. Click "Submit Assignment". Congratulations, you are done with Lab 5!
+
+
