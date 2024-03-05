@@ -1,0 +1,376 @@
+---
+title: 'Stats 250: Lab 5 Resources'
+author: "Instructional Team"
+date: "`r Sys.Date()`"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Learning Objectives
+1. Simulate the sampling distribution of Xbar
+2. Understand and apply the Central Limit Theorem (CLT)
+
+
+***
+
+
+## Statistical Review
+
+### Parameters vs Statistics
+
+In lecture, you have learned about the following terms:
+
+- Parameter: a summary value calculated from a population
+- Statistic: a summary value calculated from a sample
+
+The parameter is a fixed quantity that summarizes an entire population of interest. But what about a statistic...specifically the sample mean? You have discussed the following ideas in lecture:
+
+- The sample mean will vary from sample to sample
+- This variability will decrease if the size of the sample is increased
+- The sampling distribution of the sample mean helps us visualize how we expect a sample mean to vary from sample to sample
+
+
+### Proportions vs Means
+
+In lecture, you have worked with two summary measures - proportions and means. 
+
+- Proportions: used to help summarize *categorical* data
+- Means: used to help summarize *quantitative* data
+
+One of the first steps of any analysis is to identify the *type* of data being analyzed (categorical or quantitative). This helps us decide how to summarize the data! 
+
+
+***
+
+
+## Coding Examples
+
+### External Package
+
+The instructional team has created a package (called “stats250package”) that contains a handful of helpful functions. In addition to this package, we will also be utilizing two other external packages ("ggplot2" and "ggdist"). Load these packages by running the following code chunk:
+
+```{r load_packages}
+library(stats250package)
+library(ggplot2)
+library(ggdist)
+```
+
+
+### The Population
+
+The `employee` data set contains the records of *all* 400 employees for a start-up company founded in the early 2000s. The following data were collected in 2010 and contains the following variables:
+
+- `salary`: annual salary (in dollars)
+- `age`: age of the employee (in years)
+- `edu`: years of education (in years)
+- `startsal`: starting salary (in dollars)
+- `jobtime`: time with the company (in months)
+- `prevexp`: previous work experience (in months)
+- `minority`: Minority or Non-Minority
+- `gender`: Female or Male
+- `jobcat`: Clerical, Custodial, or Manager
+
+Read in the data using the code chunk below. 
+
+```{r read_employee_data}
+employee <- read.csv("employee_2010.csv")
+```
+
+Here's a quick preview of the data set and its variables.
+
+```{r preview_employee_data}
+head(employee)
+```
+
+To start, we're going to focus on the `salary` variable - the annual salary (in dollars) of the employee. This is a *quantitative* variable.
+
+Think About It:
+
+- Is the variable of interest (`salary`) categorical or quantitative?
+- Should we summarize salary using a proportion or a mean?
+- Would the 400 employees in this data set be considered a sample or a population? (Read the background above if you're unsure.)
+
+Let's create a histogram for the `salary` variable. 
+
+Note: an additional line of code was added to the end of our typical histogram code to add cleaner breaks along the x-axis. Feel free to use this in your own code or ignore it! 
+
+```{r histogram_salary}
+ggplot(data = employee, aes(x = salary)) + 
+  
+  geom_histogram(bins = 30, 
+                 color = "black", 
+                 fill = "grey80")+
+  
+  labs(title = "Histogram of Salary",
+       subtitle = "by Stats 250 Instructional Team",
+       x = "Annual Salary (in $)",
+       y = "Frequency") +
+  
+  scale_x_continuous(breaks = scales::pretty_breaks(n = 5))
+```
+
+How would we describe the distribution of salaries for this population? 
+
+The distribution of salaries is unimodal and *heavily skewed to the right*. The center is around 30,000 dollars with the data falling roughly between 15,000 and 140,000 dollars. (There are some potential outliers in the upper tail.) 
+
+Let's calculate the average annual salary.  
+
+```{r mean_salary}
+mean(employee$salary)
+```
+
+Think About It: Is this value a parameter or a statistic? Why?
+
+
+### Random Samples and Sample Means
+
+Suppose that for one reason or another, we didn't have the ability to collect the salaries of *all* 400 employees. But we were still interested in knowing the average annual salary of these employees - what could we do?
+
+We could collect a *sample* of employees, compute the mean of this sample, and use this value as an *estimate* of the average annual salary for all 400 employees.  
+
+We will use the `sampleMean()` function (from the stats250package) to help us collect a random sample and compute its mean.  
+
+The function takes the following arguments:
+
+- `data`: dataset$variable
+- `n`: sample size 
+
+Let's use the function to take a random sample of 10 salaries from the employee data set. 
+
+```{r sampleMean_example_n10}
+sampleMean(employee$salary, n = 10)
+```
+
+Note: if you get an error that says: could not find function "sampleMean", be sure to run the `load_packages` code chunk near the top of the file. 
+
+What sample mean did you get? Is it the same as your instructor? Is it the same as the student next to you? Probably not - because you took a *random sample* of 10 employees and calculated a sample mean. 
+
+**This statistic will vary from sample to sample!**
+
+Feel free to run the code chunk above a few times to see how the sample mean bounces around with each new random sample of size 10. 
+
+
+Let's see what happens to the sample mean (and its variability) when we increase the size of our sample to 25. 
+
+**Demo #1**: Use the `sampleMean()` function to draw a random sample of size `n = 25` for the `salary` variable.   
+
+```{r demo1, error = T}
+# Replace this text with your code
+
+```
+
+Think About It: Run the code chunk multiple times - paying attention to the value of the sample mean. Does the sample mean seem to vary by more, less, or the same amount (compared to when the size of the sample was 10)?
+
+Finally, let's see what happens to the sample mean (and its variability) when we increase the size of our sample to 100.  
+
+```{r sampleMean_example_n100}
+sampleMean(employee$salary, n = 100)
+```
+
+If you run the above code chunk multiple times, you should notice that the sample mean does not vary by much from sample-to-sample!
+
+The above exercises should help highlight our first main point of emphasis -- the variability of the sample mean decreases if a larger sample size is used. In other words, the sample mean will vary by less from sample to sample when the size of the sample is larger. 
+
+We can visualize this idea by simulating the sampling distribution! 
+
+
+### Sampling Distribution of Xbar
+
+A sampling distribution helps us visualize the variability of a statistic. It is the distribution of all possible values of a statistic for many, many random samples of the same size (n).
+
+Note: we typically only collect a *single* sample from the population of interest and make conclusions based on that *one* sample's statistic. We know (and have seen above) that a statistic will vary from sample to sample. Therefore, it is important to understand how a statistic varies from sample to sample so that we can judge whether or not our *one* observed statistic is considered "unusual". 
+
+We can *simulate* the idea of a sampling distribution using the following steps. 
+
+1. Take a random sample of size n from the population of interest
+2. With this random sample, compute the sample mean
+3. Save the value of the sample mean computed in Step 2
+4. Repeat Steps 1 - 3 many, many times 
+5. Create a plot of the many, many saved sample means
+
+The `sampleMean()` function generated *one* random sample every time we ran the function. What if we wanted to generate *many, many* random samples - say 500 random samples? We can use the `simMeans()` function!
+
+The function takes the same arguments as the previous function:
+
+- `data`: dataset$variable
+- `n`: sample size  
+
+The function will return a plot of 500 sample means calculated from 500 random samples of size n. Note: the value of 500 is not the sample size, but rather the number of sample means we will collect.  
+
+We will start by taking samples of size 10. Although our sample size is 10, the function is:
+
+- taking many, many random samples of size 10
+- calculating the sample mean for each random sample of size 10
+- saving the value for each of the resulting sample means
+- creating a plot of these saved sample means
+
+```{r simMeans_example_n10}
+simMeans(employee$salary, n = 10)
+```
+
+Each dot in the above graph represents *the average salary for a random sample of 10 employees*. 
+
+Remember the population distribution for salary (from the `histogram_salary` code chunk)? Let's compare our simulated sampling distribution to the population distribution:
+
+- **Center:** the simulated sampling distribution of Xbar has the *same center* as the population distribution (roughly 36,000)
+- **Spread:** the simulated sampling distribution of Xbar is *narrower* than the population distribution (the range has decreased)
+- **Shape:** the simulated sampling distribution of Xbar is still skewed to the right, but the skew is much less severe than the population distribution
+
+
+Think About It: In terms of the center, spread, and shape...what do we expect to happen to the simulated sampling distribution of Xbar when the size of each sample is increased to 25? 
+
+
+**Demo #2**: Using the `simMeans()` function and the `salary` variable, simulate the sampling distribution of Xbar for random samples of size 25. What does each dot represent in the resulting plot? 
+
+```{r demo2, error = T}
+# Replace this text with your code
+
+```
+
+**Answer:** Replace this text with your answer.
+
+When comparing the simulated sampling distributions of Xbar from when n = 10 to when n = 25, what do we notice in terms of the center, spread, and shape?
+
+- **Center:** the simulated sampling distributions have the *same center* (roughly 36,000)
+- **Spread:** the simulated sampling distribution of Xbar when n = 25 is *narrower* than the simulated sampling distribution of Xbar when n = 10
+- **Shape:** the simulated sampling distribution of Xbar when n = 25 is *approximately bell-shaped* (the distribution roughly follows a normal model)  
+
+
+Finally, let's see what happens to the simulated sampling distribution of Xbar when we increase the size of our sample to 100. 
+
+```{r simMeans_example_n100}
+simMeans(employee$salary, n = 100)
+```
+
+When comparing the simulated sampling distributions of Xbar from when n = 25 to when n = 100, what do we notice in terms of the center, spread, and shape?
+
+- **Center:** the simulated sampling distributions have the *same center* (roughly 36,000)
+- **Spread:** the simulated sampling distribution of Xbar when n = 100 is *narrower* than the simulated sampling distribution of Xbar when n = 25
+- **Shape:** the simulated sampling distribution of Xbar when n = 100 is *bell-shaped* (the distribution follows a normal model)  
+
+
+**THINK-PAIR-SHARE:** Consider the following two questions:
+
+- In which of the three scenarios (n = 10, n = 25, n = 100) would observing a sample mean salary of at least $40,000 be the *most* unusual (or most unlikely)? Why?
+- Which of the following distributions will be approximately normal if a sample of 100 employees is collected? The distribution of salaries for every employee at the company, the distribution of salaries for the sample of 100 employees, or the sampling distribution of the mean salary for repeated random samples of 100 employees?
+
+
+
+### Conclusions
+
+The above examples helped us illustrate some very important concepts for sample means, all of which can be found on your formula card. 
+
+**Result #1**: The expected value (or center) of the sampling distribution for the sample mean (Xbar) is equal to the mean of the population distribution (mu). In each of the graphs, we saw that the center was about 36,000.
+
+**Result #2**: The standard deviation (or spread) of the sampling distribution for the sample mean (Xbar) decreases as the sample size is increased.  
+
+**Result #3**: The shape of the sampling distribution for the sample mean (Xbar) was approximately normal when the sample size was large enough. This last conclusion has a specific name -- the **Central Limit Theorem** -- and is one of the most important concepts in statistics. With a large enough sample size, the distribution of the sample mean will be approximately normal even if the underlying population distribution is not normal. And as we increase the sample size, the normal approximation to the distribution of the sample mean gets better and better.
+
+
+
+### All These Distributions
+
+It can be difficult to fully comprehend the third result and what exactly is happening with the Central Limit Theorem (CLT). Let's break down the different distributions and what is impacted by the CLT. 
+
+#### Population Distribution
+
+This is the plot of *all* values from the population of interest. We typically don't have the entire set of observations, but in this case we do! So we can plot the salaries of *all* 400 employees. 
+
+```{r population_distribution}
+ggplot(data = employee, aes(x = salary)) + 
+  
+  geom_histogram(bins = 30, 
+                 color = "black", 
+                 fill = "grey80")+
+  
+  labs(title = "Population Distribution",
+       subtitle = "Plot of ALL 400 Salaries",
+       x = "Annual Salary (in $)",
+       y = "Frequency") +
+  
+  scale_x_continuous(breaks = scales::pretty_breaks(n = 5))
+```
+
+Every observation in this graph represents the salary for a single employee. Here, we have plotted *all* 400 salaries.
+
+This is a *fixed* distribution. It includes *all* values from the population so its shape, center, and spread do not change. We compute parameters from a population of data.  
+
+Run the code chunk above a few times to see that this distribution does not change. 
+
+
+#### Sample Distribution
+
+When we cannot collect *all* values from the population of interest, we collect a sample (subset) of values instead. The plot of a random *sample* is called the *sample distribution* (not the sampling distribution). By adding the `plot = TRUE` argument from our `sampleMean()` function from before, we can plot the distribution of a random sample.
+
+```{r sample_distribution}
+sampleMean(employee$salary, n = 100, plot = TRUE, 
+           title = "Sample Distribution")
+```
+
+Every observation in this graph represents the salary of a single employee. The above histogram illustrates the salaries for a random sample of 100 employees.
+
+This distribution varies from sample to sample (i.e., every time we collect a new random sample of 100 employees), but generally mimics the shape, center, and spread of the population distribution. We compute statistics from a sample of data - and these can be used as estimates of the true parameters.
+
+Run the code chunk above a few times to see to the sample distribution change (slightly) with each new random draw. 
+
+
+#### Sampling Distribution of the Sample Mean
+
+This is the toughest distribution to think about because we visualize it through simulation. If we were to collect many, many random samples (of size n) and compute the sample mean for each of these random samples, then the sampling distribution of the sample mean would be the plot of these many, many sample means. 
+
+```{r sampling_distribution_of_the_sample_mean}
+simMeans(employee$salary, n = 100)
+```
+
+Each dot represents the sample mean for a random sample of 100 observations. Because each dot is the mean of 100 values, each dot would have its own sample distribution (the distribution from the previous section)!
+
+While the simulated sampling distribution of Xbar will vary a little bit every time you run the code chunk, this is only because we're simulating the plot. The center and spread of this distribution are actually fixed based on the parameters of the original variable. 
+
+This is the only distribution impacted by the CLT! If a large enough sample size is used (at least 25), then the sampling distribution of the sample mean will be approximately normal. This large sample size does not change or impact the shape of the population distribution or the shape of the sample distribution. The CLT only impacts the shape of the sampling distribution of Xbar. 
+
+
+
+### Normal Population Distributions
+
+What if the population distribution is normally distributed? What would be the shape of the sampling distribution of Xbar? Do we still need a large sample size for this to be true?
+
+Suppose we had recorded the heights (in inches) of *all* 400 employees.
+
+```{r read_heights_data}
+heights_data <- read.csv("employee_heights.csv")
+```
+
+We can first visualize the *population* distribution - the distribution of heights for *all* 400 employees.. 
+
+```{r histogram_heights_population}
+ggplot(data = heights_data, aes(x = heights)) + 
+  
+  geom_histogram(bins = 15, 
+                 color = "black", 
+                 fill = "grey80")+
+  
+  labs(title = "Histogram of Heights",
+       subtitle = "(for the population of all 400 employees)",
+       x = "Height (in inches)",
+       y = "Frequency") 
+```
+
+This distribution appears to follow a normal, bell-shaped model. 
+
+With salary, our population distribution was heavily skewed to the right - so the simulated sampling distribution of Xbar also showed some right skew when a smaller sample size was used (n = 10). What do you think will happen with the simulated sampling distribution of Xbar for heights?
+
+```{r simMeans_normal_example_n10}
+simMeans(heights_data$heights, n = 10)
+```
+
+The simulated sampling distribution of Xbar is normal! Even though a small sample size was used (n < 25), the simulated sampling distribution of Xbar is still normal because the population distribution (the original distribution of heights) is normal!
+
+In this case, we do not need to rely on the Central Limit Theorem. *If the population distribution is normal, then the sampling distribution of Xbar will be normal too (regardless of sample size).* 
+
+
+
+Click on the file titled `lab05_assignment.Rmd` in the bottom right window to open up the lab assignment for today. Please do not hesitate to ask questions during lab today - sampling distributions are one of the toughest concepts we cover!
+
